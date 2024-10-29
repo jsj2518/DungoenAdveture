@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float lookSensitivity;
     private float camCurXRot;
     private Vector2 mouseDelta;
-    private bool canLook = true;
+    [HideInInspector] public bool canLook = true;
 
     public Action inventoryToggle;
 
