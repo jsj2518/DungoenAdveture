@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,6 +10,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpPower;
     [SerializeField] private LayerMask groundLayerMask;
     private Vector2 curMovementInput;
+
+    [SerializeField] private Transform startPoint;
+    [SerializeField] private LayerMask layerTrampoline;
 
     [Header("Look")]
     [SerializeField] private Transform cameraContainer;
@@ -32,10 +36,13 @@ public class PlayerController : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         CharacterManager.Instance.Player.condition.OnEndBuff += BuffEndEvent;
+        GotoStartPoint();
     }
 
     private void FixedUpdate()
     {
+        if (transform.position.y < -10f) GotoStartPoint();
+
         Move();
     }
 
@@ -47,12 +54,32 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void GotoStartPoint()
+    {
+        transform.position = startPoint.position;
+    }
+
 
     private void Move()
     {
-        Vector3 dir = transform.forward * curMovementInput.y + transform.right * curMovementInput.x;
-        dir *= moveSpeed;
-        dir.y = _rigidbody.velocity.y;
+        Vector3 dir = (transform.forward * curMovementInput.y + transform.right * curMovementInput.x).normalized;
+
+        if (IsGrounded())
+        {
+            dir *= moveSpeed;
+            dir.y = _rigidbody.velocity.y;
+        }
+        else
+        {
+            dir *= moveSpeed * Time.deltaTime * 5f;
+            Vector3 temp = dir + _rigidbody.velocity;
+            temp = new Vector3(temp.x, 0, temp.z);
+            if (temp.magnitude > moveSpeed)
+            {
+                temp = temp.normalized * moveSpeed;
+            }
+            dir = new Vector3(temp.x, _rigidbody.velocity.y, temp.z);
+        }
 
         _rigidbody.velocity = dir;
     }
@@ -113,6 +140,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (IsLayerMatched(layerTrampoline, collision.gameObject.layer))
+        {
+            _rigidbody.AddForce(Vector2.up * 500f, ForceMode.Impulse);
+        }
+    }
+
     public void OnUseAbility(InputAction.CallbackContext context)
     {
         Debug.Log($"{CharacterManager.Instance.Player.ability}    {CharacterManager.Instance.Player.condition.buffActivated}");
@@ -146,5 +181,10 @@ public class PlayerController : MonoBehaviour
         bool toggle = Cursor.lockState == CursorLockMode.Locked;
         Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
         canLook = !toggle;
+    }
+
+    private bool IsLayerMatched(int layerMask, int objectLayer)
+    {
+        return layerMask == (layerMask | (1 << objectLayer));
     }
 }

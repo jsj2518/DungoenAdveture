@@ -12,7 +12,7 @@ public enum ItemType
 public enum ConsumableType
 {
     Health,
-    Hunger
+    Mana
 }
 
 public enum AdditionalAbility
