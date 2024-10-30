@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        CharacterManager.Instance.Player.condition.OnEndBuff += BuffEndEvent;
     }
 
     private void FixedUpdate()
@@ -110,6 +111,25 @@ public class PlayerController : MonoBehaviour
         {
             _rigidbody.AddForce(Vector2.up * jumpPower, ForceMode.Impulse);
         }
+    }
+
+    public void OnUseAbility(InputAction.CallbackContext context)
+    {
+        Debug.Log($"{CharacterManager.Instance.Player.ability}    {CharacterManager.Instance.Player.condition.buffActivated}");
+        if (context.phase == InputActionPhase.Started &&
+            CharacterManager.Instance.Player.ability != AdditionalAbility._NONE &&
+            CharacterManager.Instance.Player.condition.buffActivated == AdditionalAbility._NONE)
+        {
+            if (CharacterManager.Instance.Player.condition.UseMana(20f)) // 고정값
+            {
+                CharacterManager.Instance.Player.condition.ActivateBuff(CharacterManager.Instance.Player.ability);
+                moveSpeed *= 2f; // 효과 적용
+            }
+        }
+    }
+    private void BuffEndEvent(AdditionalAbility ability)
+    {
+        moveSpeed /= 2f; // 효과지속 끝
     }
 
     public void OnInventoryToggle(InputAction.CallbackContext context)

@@ -20,6 +20,6 @@ MonoBehaviour:
   dropPrefab: {fileID: 4170087812599287725, guid: af5236bf1e8899743a7a19d076b220cc, type: 3}
   canStack: 0
   maxStackAmount: 0
-  ability: 0
+  ability: 1
   consumables: []
   equipPrefab: {fileID: 0}

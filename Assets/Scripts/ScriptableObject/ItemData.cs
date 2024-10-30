@@ -17,6 +17,7 @@ public enum ConsumableType
 
 public enum AdditionalAbility
 {
+    _NONE,
     SpeedUp
 }
 

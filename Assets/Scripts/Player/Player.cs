@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
     [HideInInspector] public PlayerController controller;
     [HideInInspector] public PlayerCondition condition;
     [HideInInspector] public Equipment equip;
+    [HideInInspector] public AdditionalAbility ability;
 
     [HideInInspector] public ItemData itemData;
     public Action addItem;

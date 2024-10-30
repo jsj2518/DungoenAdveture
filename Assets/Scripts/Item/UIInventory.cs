@@ -64,6 +64,8 @@ public class UIInventory : MonoBehaviour
         useButton.SetActive(false);
         equipButton.SetActive(false);
         unequipButton.SetActive(false);
+        equipAbilityButton.SetActive(false);
+        unequipAbilityButton.SetActive(false);
         dropButton.SetActive(false);
     }
 
@@ -166,7 +168,10 @@ public class UIInventory : MonoBehaviour
     {
         if (slots[index].item == null) return;
 
-        slots[selectedItemIndex].highlighted = false;
+        if (selectedItemIndex >= 0)
+        {
+            slots[selectedItemIndex].highlighted = false;
+        }
 
         selectedItemIndex = index;
         selectedItem = slots[selectedItemIndex].item;
@@ -187,6 +192,8 @@ public class UIInventory : MonoBehaviour
         useButton.SetActive(selectedItem.type == ItemType.Consumable);
         equipButton.SetActive(selectedItem.type == ItemType.Equipable && slots[index].equiped == false);
         unequipButton.SetActive(selectedItem.type == ItemType.Equipable && slots[index].equiped == true);
+        equipAbilityButton.SetActive(selectedItem.type == ItemType.AddAbility && slots[index].equiped == false);
+        unequipAbilityButton.SetActive(selectedItem.type == ItemType.AddAbility && slots[index].equiped == true);
         dropButton.SetActive(true);
 
         UpdateSlotUI();
@@ -272,7 +279,7 @@ public class UIInventory : MonoBehaviour
 
         slots[selectedItemIndex].equiped = true;
         curEquipAbilityIndex = selectedItemIndex;
-        CharacterManager.Instance.Player.equip.EquipAbilityNew(selectedItem);
+        CharacterManager.Instance.Player.ability = slots[selectedItemIndex].item.ability;
         UpdateSlotUI();
 
         SelectItem(selectedItemIndex);
@@ -280,7 +287,7 @@ public class UIInventory : MonoBehaviour
     private void UnEquipAbility(int index)
     {
         slots[index].equiped = false;
-        CharacterManager.Instance.Player.equip.UnEquipAbility();
+        CharacterManager.Instance.Player.ability = AdditionalAbility._NONE;
         UpdateSlotUI();
 
         if (selectedItemIndex == index)

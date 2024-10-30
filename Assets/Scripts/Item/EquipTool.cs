@@ -37,23 +37,6 @@ public class EquipTool : Equip
         attacking = false;
     }
 
-    public override void OnAbilityInput()
-    {
-        if (maintainingBuff == false)
-        {
-            if (CharacterManager.Instance.Player.condition.UseMana(useMana))
-            {
-                maintainingBuff = true;
-
-                //animator.SetTrigger("Attack");
-            }
-        }
-    }
-    public void OnCanAbility()
-    {
-        maintainingBuff = false;
-    }
-
     public void OnHit()
     {
         Ray ray = camera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));

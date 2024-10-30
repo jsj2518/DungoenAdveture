@@ -14,7 +14,7 @@ public class ItemSlot : MonoBehaviour
 
     public event Action<int> OnClick;
 
-    public int index;
+    [HideInInspector] public int index;
     [HideInInspector] public bool equiped;
     [HideInInspector] public bool highlighted;
     [HideInInspector] public int quantity;

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public interface IDamagable
 {
@@ -14,7 +15,9 @@ public class PlayerCondition : MonoBehaviour, IDamagable
     private Condition mana { get { return uiCondition.mana; } }
     private Condition buff { get { return uiCondition.buff; } }
 
-    private bool buffActivated;
+    public AdditionalAbility buffActivated = AdditionalAbility._NONE;
+    private AdditionalAbility buffNew = AdditionalAbility._NONE;
+    public event Action<AdditionalAbility> OnEndBuff;
 
     public event Action OnTakeDamage;
 
@@ -27,6 +30,8 @@ public class PlayerCondition : MonoBehaviour, IDamagable
         {
             Die();
         }
+
+        UpdateBuff();
     }
 
     private void Die()
@@ -43,6 +48,33 @@ public class PlayerCondition : MonoBehaviour, IDamagable
     public void Eat(float amount)
     {
         mana.Add(amount);
+    }
+
+    public void ActivateBuff(AdditionalAbility buff)
+    {
+        buffNew = buff;
+    }
+    private void UpdateBuff()
+    {
+        if (buffActivated == AdditionalAbility._NONE && buffNew != AdditionalAbility._NONE)
+        {
+            buffActivated = buffNew;
+            buffNew = AdditionalAbility._NONE;
+
+            buff.curValue = buff.maxValue;
+        }
+        else if (buffActivated != AdditionalAbility._NONE)
+        {
+            buff.Add(buff.passiveValue * Time.deltaTime);
+
+            if (buff.curValue <= 0f)
+            {
+                OnEndBuff?.Invoke(buffActivated);
+                buffActivated = AdditionalAbility._NONE;
+            }
+        }
+
+        uiCondition.UpdateBuff(buffActivated);
     }
 
     public void TakePhysicalDamage(float damage)
